@@ -2523,13 +2523,13 @@ HeapWord* G1CollectedHeap::do_collection_pause(size_t word_size,
   size_t old_bytes = 0;
 
   // Iterate over all heap regions
-  for (uint i = 0; i < _regions.num_regions(); ++i) {
-      G1HeapRegion* hr = _regions.region_at(i);
+    for (size_t i = 0; i < heap_region_count(); ++i) {
+      HeapRegion* hr = heap_region_at(i);
       if (hr->is_young()) {
-          young_objects += hr->object_count(); // Assuming this method exists or similar logic to count objects
+          young_objects += hr->get_live_object_count(); // Corrected method for counting objects
           young_bytes += hr->used();
       } else {
-          old_objects += hr->object_count(); // Assuming this method exists or similar logic to count objects
+          old_objects += hr->get_live_object_count(); // Corrected method for counting objects
           old_bytes += hr->used();
       }
   }
@@ -2542,7 +2542,7 @@ HeapWord* G1CollectedHeap::do_collection_pause(size_t word_size,
   return result;
 }
 
-
+  
 void G1CollectedHeap::do_concurrent_mark() {
   MutexLockerEx x(CGC_lock, Mutex::_no_safepoint_check_flag);
   if (!_cm_thread->in_progress()) {
